@@ -4,9 +4,6 @@
 
 Set-Location P01:
 
-$exclusions = New-Object -TypeName System.Collections.ArrayList
-$exclusions.Add( (Get-CMSoftwareUpdate -Name "Microsoft .NET Framework 4.5.2 for Windows 8.1 and Windows Server 2012 R2 for x64-based Systems (KB2934520)").CI_ID )
-
 # Get all patches in Monthly SUG
 $monthly = Get-CMSoftwareUpdateGroup -Name "Workstation - Monthly"
 Write-Host Monthly: $monthly.Updates.Count
@@ -25,12 +22,12 @@ foreach ($update in $monthly.Updates)
 # Delete Monthly SUG
 Remove-CMSoftwareUpdateGroup -Name "Workstation - Monthly" -Confirm
 # Remove expired and superseded patches from baseline SUG
-R:\Workspace\Scratch\Clean-CMSoftwareUpdateGroup.ps1 -SiteServer CPTPRDMCM105 -SUGName "Workstation - Baseline" -Verbose
+.\Clean-CMSoftwareUpdateGroup.ps1 -SiteServer CPTPRDMCM105 -SUGName "Workstation - Baseline" -Verbose
 # Get updated baseline SUG
 $baseline = Get-CMSoftwareUpdateGroup -Name "Workstation - Baseline"
 Write-Host "Baseline (after):" $baseline.Updates.Count
-# Get all patches in ADR and remove any patches that are in the baseline SUG
-$newupdates = $testing.Updates | Where-Object {$baseline.updates -NotContains $_}
+# Get all patches in ADR and remove any patches that are in the baseline SUG (ie. already deploye) and exclusions SUG (ie. not to be deployed)
+$newupdates = $testing.Updates | Where-Object {$baseline.updates -NotContains $_} | Where-Object {$exclusions.updates -NotContains $_}
 Write-Host New Updates: $newupdates.Count
 # Create new Monthly SUG
 New-CMSoftwareUpdateGroup -Name "Workstation - Monthly"
