@@ -20,16 +20,14 @@ $i = 1
 foreach ($update in $monthly.Updates) 
 { 
     $progress = [Int32](($i / $totalMonthly) * 100)
-    Write-Progress -Activity "Adding Previous Months Updates to Baseline ($i/$totalMonthly)" -PercentComplete $progress
+    Write-Progress -Activity "Adding Previous Months Updates to Baseline" -PercentComplete $progress
     Add-CMSoftwareUpdateToGroup -SoftwareUpdateGroupName "Workstation - Baseline" -SoftwareUpdateId $update 
     $i++
 }
 # Delete Monthly SUG
-Remove-CMSoftwareUpdateGroup -Name "Workstation - Monthly" -Force
+Remove-CMSoftwareUpdateGroup -Name "Workstation - Monthly"
 # Remove expired and superseded patches from baseline SUG
-pushd $scriptPath
-iex "& `"$scriptPath\Clean-CMSoftwareUpdateGroup.ps1`" -SiteServer CPTPRDMCM105 -SUGName `"Workstation - Baseline`" -Verbose"
-popd
+& $scriptPath + '\Clean-CMSoftwareUpdateGroup.ps1' -SiteServer CPTPRDMCM105 -SUGName "Workstation - Baseline" -Verbose
 # Get updated baseline SUG
 $baseline = Get-CMSoftwareUpdateGroup -Name "Workstation - Baseline"
 Write-Host "Baseline (after):" $baseline.Updates.Count
@@ -45,7 +43,7 @@ $i = 1
 foreach ($update in $newupdates) 
 {
     $progress = [Int32](($i / $totalNew) * 100)
-    Write-Progress -Activity "Adding Updates to the new Monthly SUG ($i/$totalNew)" -PercentComplete $progress
+    Write-Progress -Activity "Adding Previous Months Updates to Baseline" -PercentComplete $progress
     Add-CMSoftwareUpdateToGroup -SoftwareUpdateGroupName "Workstation - Monthly" -SoftwareUpdateId $update
     $i++
 }
