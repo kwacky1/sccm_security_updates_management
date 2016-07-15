@@ -91,7 +91,7 @@ Process {
                     $ProgressCount++
                     Write-Progress -Activity "Processing Software Updates in '$($SUGName)'" -Id 1 -Status "$($ProgressCount) / $($UpdatesCount)" -CurrentOperation "$($CIID.LocalizedDisplayName)" -PercentComplete (($ProgressCount / $UpdatesCount) * 100)
                 }
-                if ($CIID.IsExpired -eq $true) {
+                if (($CIID.IsExpired -eq $true) -or ($CIID.NumMissing -eq 0)) {
                     Write-Verbose -Message "Update '$($CIID.LocalizedDisplayName)' was expired and will be removed from '$($AuthorizationList.LocalizedDisplayName)'"
                     if ($CIID.CI_ID -notin $RemovedUpdatesList) {
                         $RemovedUpdatesList.Add($CIID.CI_ID) | Out-Null

@@ -1,5 +1,6 @@
-﻿$SUGName = "Build and Capture Only Deployment"
+﻿#$SUGName = "Build and Capture Only Deployment"
 #$SUGName = "Double Restart Updates"
+$SUGName = "Workstation - Monthly"
 
 #$missing = import-csv d:\temp\yay207updates.csv
 pushd P01:
@@ -9,7 +10,7 @@ foreach ($updateid in $missing.Updates)
 { 
     sl P01:
     write-host UpdateID: $updateid
-    $cmupdate = Get-CMSoftwareUpdate -ID $updateid
+    $cmupdate = Get-CMSoftwareUpdate -ID $updateid -Fast
     $displayName = ((([xml]$cmupdate.SDMPackageXML).DesiredConfigurationDigest).GetElementsByTagName('DisplayName')).Text.Replace("/","-")
     $version = (([xml]$cmupdate.SDMPackageXML).DesiredConfigurationDigest.FirstChild).Version
     write-host Display Name: $displayName
